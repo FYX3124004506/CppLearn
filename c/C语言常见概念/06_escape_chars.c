@@ -22,7 +22,7 @@ int main(void) {
     printf("6) \\' 单引号：'A'\n");
     printf("7) \\\" 双引号：\"Hello, World!\"\n");
 
-    // \0 是字符串结束标志；后面的 World 不会被 %s 输出。
+    // \0 是空字符；在字符串中会作为结束标志，因此后面的 World 不会被 %s 输出。
     char truncated[] = "Hello\0World";
     printf("8) \\0 截断：\"Hello\\0World\" -> %s\n", truncated);
     putchar('\n');

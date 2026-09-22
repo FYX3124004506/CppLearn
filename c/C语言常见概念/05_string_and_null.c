@@ -8,19 +8,23 @@
 #include <string.h>
 
 int main(void) {
+    /*
+     * 当前 Windows C 运行库对 %zu 的支持不一致；本示例中的长度很小，
+     * 转换为 unsigned long 后使用 %lu 可以兼容该环境并保持输出正确。
+     */
     // 双引号字符串字面量会自动在末尾追加 \0。
     char str1[] = "hello";
-    printf("str1 = \"%s\"  sizeof = %u  strlen = %u\n",
+    printf("str1 = \"%s\"  sizeof = %lu  strlen = %lu\n",
            str1,
-           (unsigned int)sizeof str1,
-           (unsigned int)strlen(str1));
+           (unsigned long)sizeof str1,
+           (unsigned long)strlen(str1));
 
     // 使用字符数组初始化时，需要手动写入 \0。
     char str2[] = {'h', 'e', 'l', 'l', 'o', '\0'};
-    printf("str2 = \"%s\"  sizeof = %u  strlen = %u\n",
+    printf("str2 = \"%s\"  sizeof = %lu  strlen = %lu\n",
            str2,
-           (unsigned int)sizeof str2,
-           (unsigned int)strlen(str2));
+           (unsigned long)sizeof str2,
+           (unsigned long)strlen(str2));
     putchar('\n');
 
     /*
@@ -29,10 +33,10 @@ int main(void) {
      */
     char text[] = "ABCDEF";
     printf("字符串：%s\n", text);
-    printf("strlen(text) = %u（不包含 \\0）\n",
-           (unsigned int)strlen(text));
-    printf("sizeof text = %u（包含 \\0）\n",
-           (unsigned int)sizeof text);
+    printf("strlen(text) = %lu（不包含 \\0）\n",
+           (unsigned long)strlen(text));
+    printf("sizeof text = %lu（包含 \\0）\n",
+           (unsigned long)sizeof text);
     putchar('\n');
 
     // 提前写入 \0 会让字符串输出在该位置结束。
