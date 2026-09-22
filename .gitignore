@@ -1,0 +1,24 @@
+# IDE 配置与用户级文件
+.vs/
+.idea/
+*.user
+*.suo
+
+# 编译输出
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+*.exe
+*.obj
+*.o
+*.pdb
+*.idb
+*.ilk
+*.tlog/
+*.log
+
+# 常见构建目录
+CMakeFiles/
+cmake-build-*
