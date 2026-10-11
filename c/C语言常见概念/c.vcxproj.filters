@@ -45,5 +45,8 @@
     <ClCompile Include="10_comments.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="11_data_types_and_variables.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
