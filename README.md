@@ -20,7 +20,8 @@ CppLearn 是一个面向长期学习和复习的 C/C++ 示例代码仓库。仓�
 
 | 模块 | 当前内容 | 扩展方向 |
 | :--- | :--- | :--- |
-| `c/C语言常见概念/` | C 语言入门概念和基础语法示例 | 变量与类型、运算符、数组、指针、函数、结构体、文件、内存管理等 |
+| `c/C语言常见概念/` | 程序结构、字符与字符串、输入输出、控制结构、注释及基础类型示例 | 运算符、数组、指针、函数、结构体、文件、内存管理等 |
+| `c/C语言数据类型和变量/` | 变量声明、赋值、作用域和存储期的独立示例 | 类型范围、类型转换和更复杂的变量练习 |
 | `c/` 其他主题目录 | 预留 | 可按知识主题增加独立目录 |
 | `cpp/` | 预留 | C++ 语法、类、模板、标准库和现代 C++ 示例 |
 | `data-structures/` | 预留 | 线性表、栈、队列、树、图和查找排序 |
@@ -35,14 +36,18 @@ CppLearn 是一个面向长期学习和复习的 C/C++ 示例代码仓库。仓�
 ```text
 CppLearn/
 ├── c/
-│   └── C语言常见概念/
-│       ├── 01_hello_world.c
-│       ├── ...
-│       ├── 10_comments.c
-│       ├── README.md
-│       ├── c.sln
-│       ├── c.vcxproj
-│       └── c.vcxproj.filters
+│   ├── C语言常见概念/
+│   │   ├── 01_hello_world.c
+│   │   ├── ...
+│   │   ├── 10_comments.c
+│   │   ├── 11_data_types_and_variables.c
+│   │   ├── README.md
+│   │   ├── c.sln
+│   │   ├── c.vcxproj
+│   │   └── c.vcxproj.filters
+│   └── C语言数据类型和变量/
+│       ├── 01_variables_and_scope.c
+│       └── README.md
 ├── .gitignore
 └── README.md
 ```
@@ -157,4 +162,5 @@ Windows PowerShell 中运行：
 ## 相关目录
 
 - [C 语言常见概念示例](c/C语言常见概念/README.md)
+- [C 语言数据类型和变量示例](c/C语言数据类型和变量/README.md)
 - [Gitee 仓库说明](https://gitee.com/fyx0927/gitee-cpp-learn)
