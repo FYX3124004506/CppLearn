@@ -18,14 +18,18 @@ int main(void)
     float rate = 0.75f;
     double price = 12.5;
     bool is_ready = true;
+    /* 枚举用具名整数常量表示有限选项。 */
+    enum TaskState { TASK_PENDING, TASK_DONE };
+    enum TaskState task_state = TASK_DONE;
 
     printf("字符：%c，unsigned char：%u\n",
            initial, (unsigned int)small_value);
     printf("整数：%d，long：%ld\n", count, population);
     printf("浮点数：%.2f，double：%.2f\n", rate, price);
     printf("布尔值：%s\n", is_ready ? "true" : "false");
+    printf("枚举值：%d\n", (int)task_state);
 
-    /* 兼容部分 MinGW 格式诊断；这里转换已知较小的类型大小。 */
+    /* 旧 MinGW 诊断器不识别 %zu；此处只输出基本类型大小。 */
     printf("sizeof(char) = %lu byte\n", (unsigned long)sizeof(char));
     printf("sizeof(int) = %lu bytes\n", (unsigned long)sizeof(int));
     printf("sizeof(double) = %lu bytes\n", (unsigned long)sizeof(double));

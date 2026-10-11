@@ -11,10 +11,10 @@ int main(void) {
     int age = 18;
     printf("年龄：%d\n", age);
 
-    // %c 输出字符；字符常量也可以按整数输出其编码值。
+    // %c 输出字符，%d 输出执行字符集中的编码值。
     char ch = 'A';
     printf("字符：%c\n", ch);
-    printf("ASCII：%d\n", ch);
+    printf("字符编码值：%d\n", ch);
 
     // %f 输出 double；精度和字段宽度可以写在格式符中。
     double pi = 3.1415926;
