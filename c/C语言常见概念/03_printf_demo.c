@@ -62,6 +62,8 @@ int main(void) {
     printf("字符串精度：%.5s\n", sample);
     printf("显式正号：%+.2f\n", pi);
     printf("sizeof(age)=%zu 字节\n", age_size);
+    printf("No automatic newline:");
+    printf(" the next call continues on this line.\n");
 
     // 一个 printf 可以按照格式顺序输出多个变量。
     printf("%s 今年 %d 岁，圆周率约 %.2f\n", name, age, pi);

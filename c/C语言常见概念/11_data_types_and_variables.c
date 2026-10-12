@@ -84,6 +84,12 @@ int main(void)
            CHAR_BIT, INT_MIN, INT_MAX, UINT_MAX);
     printf("short=[%hd,%hd], long=[%ld,%ld], long long=[%lld,%lld]\n",
            SHRT_MIN, SHRT_MAX, LONG_MIN, LONG_MAX, LLONG_MIN, LLONG_MAX);
+    if (UCHAR_MAX < UINT_MAX) {
+        unsigned int one_past_char = (unsigned int)UCHAR_MAX + 1U;
+        unsigned char narrowed = (unsigned char)one_past_char;
+        printf("unsigned conversion: %u -> %u\n",
+               one_past_char, (unsigned)narrowed);
+    }
 
     int_least32_t at_least_32 = 123;
     printf("minimum-width type: %" PRIdLEAST32 "\n", at_least_32);
@@ -109,6 +115,10 @@ int main(void)
     printf("enum status=%d; STATUS_DONE is the next implicit value\n", (int)status);
     printf("FLT_DIG=%d, DBL_DIG=%d, LDBL_DIG=%d, FLT_MAX=%g\n",
            FLT_DIG, DBL_DIG, LDBL_DIG, (double)FLT_MAX);
+    double decimal_sum = 0.1 + 0.2;
+    printf("0.1 + 0.2 = %.17g; equal to 0.3: %s\n", decimal_sum,
+           decimal_sum == 0.3 ? "yes" : "no");
+    /* The displayed rounding and equality result depend on the implementation. */
     /* An enum's compatible integer type is implementation-defined. */
 
     section("arrays, structures, unions, pointers, and functions");
@@ -116,6 +126,7 @@ int main(void)
     struct Point point = {3, 4};
     union Number number = {.integer = 42};
     int (*operation)(int, int) = add;
+    /* Function pointers are distinct from object pointers; only the object pointer is printed with %p. */
     int *first = values;
     void *object_pointer = &point;
 
@@ -145,6 +156,7 @@ int main(void)
     int difference = 9 - 4;
     int product = 3 * 4;
     int integer_quotient = 6 / 4;
+    int negative_quotient = -6 / 4;
     double floating_quotient = 6 / 4.0;
     int remainder = -13 % 5;
     int negative = -1;
@@ -152,21 +164,26 @@ int main(void)
     unsigned int wrapped = UINT_MAX;
 
     wrapped += 1U;
-    printf("9-4=%d, 3*4=%d; 6/4=%d, 6/4.0=%.1f, -13%%5=%d\n",
-           difference, product, integer_quotient, floating_quotient, remainder);
+    printf("9-4=%d, 3*4=%d; 6/4=%d, -6/4=%d, 6/4.0=%.1f, -13%%5=%d\n",
+           difference, product, integer_quotient, negative_quotient,
+           floating_quotient, remainder);
     printf("mixed signed/unsigned=%u; UINT_MAX+1=%u\n", mixed, wrapped);
-#if UCHAR_MAX < INT_MAX
+#if UCHAR_MAX <= INT_MAX
     int promoted_sum = (unsigned char)UCHAR_MAX + 1;
     printf("unsigned char promotes to int: UCHAR_MAX+1=%d\n", promoted_sum);
 #else
     unsigned int promoted_sum = (unsigned char)UCHAR_MAX + 1U;
     printf("unsigned char promotes to unsigned int: %u\n", promoted_sum);
 #endif
-    int denominator = 4;
-    /* Check a denominator before division or remainder. */
-    if (denominator != 0) {
-        printf("guarded division/remainder: 20/%d=%d, 20%%%d=%d\n",
-               denominator, 20 / denominator, denominator, 20 % denominator);
+    int denominators[] = {0, 4};
+    for (size_t i = 0; i < sizeof denominators / sizeof denominators[0]; ++i) {
+        int denominator = denominators[i];
+        if (denominator == 0) {
+            puts("division and remainder skipped for zero denominator");
+        } else {
+            printf("guarded division/remainder: 20/%d=%d, 20%%%d=%d\n",
+                   denominator, 20 / denominator, denominator, 20 % denominator);
+        }
     }
     /* Signed overflow and INT_MIN / -1 are undefined; neither is executed. */
 
@@ -194,7 +211,7 @@ int main(void)
     /* Two unsequenced updates to the same scalar in one call would be undefined. */
 
     section("explicit conversion");
-    double decimal = 3.14;
+    double decimal = -3.14;
     int whole = (int)decimal;
     printf("float-to-int truncates toward zero: %.2f -> %d\n", decimal, whole);
     /* Do not convert a floating value outside the target integer range. */
