@@ -1,8 +1,12 @@
 /*
- * Demonstrate scanf-family formats and safe line-based numeric parsing.
- * Input: three lines: a name, a nonnegative integer, and a nonnegative finite number.
- * Compile as C11, run, then enter those three values.
+ * 演示 scanf 格式规则，以及基于整行文本的安全数值解析。
+ * 输入三行：姓名、非负整数、非负有限数。
+ * 使用 C11 编译并运行，然后按提示输入这三项内容。
  */
+#if defined(__MINGW32__) && !defined(__USE_MINGW_ANSI_STDIO)
+#define __USE_MINGW_ANSI_STDIO 1
+#endif
+
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
@@ -11,7 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* scanf %f expects float * and %lf expects double *; printf %f uses double. */
+/* scanf 的 %f 接收 float *，%lf 接收 double *；printf 的 %f 对应 double 实参。 */
 static void demonstrate_scanf_formats(void)
 {
     const char sample[] = "-12 42 3.5 6.25 Z word";
@@ -54,9 +58,22 @@ static void demonstrate_scanf_formats(void)
     char first_word[20] = "";
     (void)sscanf("red blue", "%19s", first_word);
     printf("bounded %%s stops at whitespace: %s\n", first_word);
-    /* A field width counts input characters; multibyte text may need more storage bytes. */
-    /* scanf skips leading space for most conversions, but not for %c, %[ or %n. */
-    /* scanf_s is optional Annex K; numeric input outside the target range is unsafe. */
+
+    /* 只统计固定 UTF-8 字节序列的输入长度，不把可能截断的字节序列作为文字输出。 */
+#if CHAR_BIT == 8
+    const unsigned char utf8_bytes[] = {0xE4U, 0xB8U, 0xADU, 0x41U, 0U};
+    char utf8_source[sizeof utf8_bytes];
+    char first_two_bytes[3] = "";
+    memcpy(utf8_source, utf8_bytes, sizeof utf8_bytes);
+    int utf8_assigned = sscanf(utf8_source, "%2s", first_two_bytes);
+    printf("UTF-8 sample input bytes=%zu; field width=2 stored bytes=%zu; assigned=%d\n",
+           sizeof utf8_source - 1, strlen(first_two_bytes), utf8_assigned);
+#else
+    puts("UTF-8 byte-count example skipped because this target does not use 8-bit bytes.");
+#endif
+    /* 窄字符 %s 的字段宽度按输入字节限制；多字节文本要按缓冲区字节容量设置宽度。 */
+    /* scanf 的多数转换会跳过前导空白；%c、%[ 和 %n 不会。 */
+    /* scanf_s 属于可选的附录 K 接口；数值输入超出目标类型范围时不能依赖 scanf 安全处理。 */
 }
 
 static int read_line(char *buffer, int capacity)

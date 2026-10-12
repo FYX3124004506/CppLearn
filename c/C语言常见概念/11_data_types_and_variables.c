@@ -1,9 +1,8 @@
 /*
- * C11 examples for common types, object sizes, numeric limits, and operators.
- * Input: none. Compile as C11 and run.
- * Ordinary identifiers are case-sensitive, start with a letter or underscore, and continue
- * with letters, digits, or underscores; keywords are reserved.
- * Scope and storage duration are language rules; memory placement is implementation-specific.
+ * 演示常见类型、对象大小、数值范围和运算符。
+ * 输入：无。使用 C11 编译后运行。
+ * 普通标识符区分大小写，以字母或下划线开头，后续可含字母、数字和下划线；关键字保留。
+ * 作用域和存储期由语言规则定义；对象的具体内存位置由实现决定。
  */
 #if defined(__MINGW32__) && !defined(__USE_MINGW_ANSI_STDIO)
 #define __USE_MINGW_ANSI_STDIO 1
@@ -17,14 +16,14 @@
 #include <stdint.h>
 #include <stdio.h>
 
-/* Integer and floating types are arithmetic; pointers are scalar types. */
-/* Arrays and structures are aggregate types; unions are a separate category. */
-/* _Bool and enumeration types are integer types. */
+/* 整数类型和浮点类型属于算术类型；指针类型属于标量类型。 */
+/* 数组和结构是聚合类型；联合属于另一类类型。 */
+/* _Bool 和枚举类型属于整数类型。 */
 struct Point { int x; int y; };
 union Number { int integer; float real; };
 enum Status { STATUS_IDLE, STATUS_READY = 3, STATUS_DONE };
 
-int file_scope_count; /* Tentative definition with static storage duration; zero initialized. */
+int file_scope_count; /* 暂定定义具有静态存储期；未显式初始化时会被零初始化。 */
 
 static int add(int left, int right)
 {
@@ -56,9 +55,9 @@ static void show_vla_size(void)
 
 int main(void)
 {
-    extern int file_scope_count; /* Declaration of the existing file-scope object. */
+    extern int file_scope_count; /* 声明已经存在的文件作用域对象。 */
     section("character and integer types");
-    char letter = 'A'; /* The execution character set determines its numeric value. */
+    char letter = 'A'; /* 字符常量的数值由实现的执行字符集决定。 */
     signed char negative_byte = -10;
     unsigned char byte = UCHAR_MAX;
     short short_value = -12;
@@ -113,32 +112,42 @@ int main(void)
     printf("_Bool normalizes nonzero to %d; bool=%s\n",
            normalized, ready ? "true" : "false");
     printf("enum status=%d; STATUS_DONE is the next implicit value\n", (int)status);
+    const char *enum_compatible_type = _Generic(
+        status,
+        char: "char", signed char: "signed char", unsigned char: "unsigned char",
+        short: "short", unsigned short: "unsigned short",
+        int: "int", unsigned int: "unsigned int",
+        long: "long", unsigned long: "unsigned long",
+        long long: "long long", unsigned long long: "unsigned long long",
+        default: "other compatible integer type");
+    printf("enum compatible integer type on this implementation=%s\n",
+           enum_compatible_type);
     printf("FLT_DIG=%d, DBL_DIG=%d, LDBL_DIG=%d, FLT_MAX=%g\n",
            FLT_DIG, DBL_DIG, LDBL_DIG, (double)FLT_MAX);
     double decimal_sum = 0.1 + 0.2;
     printf("0.1 + 0.2 = %.17g; equal to 0.3: %s\n", decimal_sum,
            decimal_sum == 0.3 ? "yes" : "no");
-    /* The displayed rounding and equality result depend on the implementation. */
-    /* An enum's compatible integer type is implementation-defined. */
+    /* 显示的舍入结果和比较结果可能随实现而异。 */
+    /* 枚举类型所兼容的整数类型由实现定义。 */
 
     section("arrays, structures, unions, pointers, and functions");
     int values[] = {2, 3, 5};
     struct Point point = {3, 4};
     union Number number = {.integer = 42};
     int (*operation)(int, int) = add;
-    /* Function pointers are distinct from object pointers; only the object pointer is printed with %p. */
+    /* 函数指针与对象指针不同；这里只把对象指针转换后交给 %p 输出。 */
     int *first = values;
     void *object_pointer = &point;
 
     printf("array=%d, struct=(%d,%d), union=%d, add(2,3)=%d\n",
            *first, point.x, point.y, number.integer, operation(2, 3));
     printf("object pointer=%p\n", (void *)object_pointer);
-    /* A void pointer can hold an object pointer, but cannot be dereferenced directly. */
+    /* void 指针可以保存对象指针，但不能直接解引用。 */
 
     section("sizeof and object sizes");
     int probe = 4;
     size_t expression_size = sizeof(probe++);
-    /* Standard integer sizes are nondecreasing by rank; exact sizes vary by implementation. */
+    /* 标准整数类型的大小按等级不递减；具体大小由实现决定。 */
     printf("char=%zu, short=%zu, int=%zu, long=%zu, long long=%zu bytes\n",
            sizeof(char), sizeof(short), sizeof(int), sizeof(long),
            sizeof(long long));
@@ -168,7 +177,8 @@ int main(void)
            difference, product, integer_quotient, negative_quotient,
            floating_quotient, remainder);
     printf("mixed signed/unsigned=%u; UINT_MAX+1=%u\n", mixed, wrapped);
-#if UCHAR_MAX <= INT_MAX
+/* 严格小于时提升后的 int 才能安全计算 UCHAR_MAX + 1；相等时改用 unsigned int。 */
+#if UCHAR_MAX < INT_MAX
     int promoted_sum = (unsigned char)UCHAR_MAX + 1;
     printf("unsigned char promotes to int: UCHAR_MAX+1=%d\n", promoted_sum);
 #else
@@ -185,7 +195,12 @@ int main(void)
                    denominator, 20 / denominator, denominator, 20 % denominator);
         }
     }
-    /* Signed overflow and INT_MIN / -1 are undefined; neither is executed. */
+    /* 有符号运算超出可表示范围时行为未定义；此程序不执行越界运算。 */
+    if (INT_MIN < -INT_MAX) {
+        puts("本实现的 INT_MIN / -1 商无法用 int 表示；仅检查边界，不执行除法。");
+    } else {
+        puts("本实现的 int 范围可以表示 INT_MIN / -1 的数学商。");
+    }
 
     section("assignment and increment");
     int a, b, c;
@@ -193,7 +208,7 @@ int main(void)
     int count = 5;
     count += 3;
     count *= 2;
-    /* Other compound forms: -=, /=, %=, <<=, >>=, &=, ^=, and |=. */
+    /* 其他复合赋值形式包括 -=、/=、%=、<<=、>>=、&=、^= 和 |=。 */
     int old_value = count++;
     int new_value = ++count;
     int decrement = 3;
@@ -208,13 +223,13 @@ int main(void)
     printf("compound left side evaluated once: index=%zu\n", index);
     printf("updated element=%d; unary plus=%d, unary minus=%d\n",
            indexed[0], +count, -count);
-    /* Two unsequenced updates to the same scalar in one call would be undefined. */
+    /* 在一次调用中无序地多次修改同一标量对象会导致未定义行为。 */
 
     section("explicit conversion");
     double decimal = -3.14;
     int whole = (int)decimal;
     printf("float-to-int truncates toward zero: %.2f -> %d\n", decimal, whole);
-    /* Do not convert a floating value outside the target integer range. */
+    /* 浮点值超出目标整数类型范围时，不要执行这种转换。 */
     printf("static-storage file object starts at %d\n", file_scope_count);
     return 0;
 }

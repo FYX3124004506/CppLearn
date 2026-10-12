@@ -1,6 +1,6 @@
 /*
- * Demonstrate C byte units, size_t, and the difference between an array and a pointer.
- * Input: none. Compile as C11 and run.
+ * 演示 C 字节、size_t，以及数组与指针的区别。
+ * 输入：无。使用 C11 编译后运行。
  */
 #if defined(__MINGW32__) && !defined(__USE_MINGW_ANSI_STDIO)
 #define __USE_MINGW_ANSI_STDIO 1
@@ -32,7 +32,7 @@ int main(void)
     printf("pointer bytes=%zu; sizeof *pointer=%zu; first value=%d\n",
            sizeof pointer, sizeof *pointer, *pointer);
     printf("sizeof(probe++)=%zu; probe remains %d\n", unevaluated_size, probe);
-    /* sizeof(char) is one C byte; CHAR_BIT shows how many bits that byte contains. */
-    /* Exact sizes vary by implementation. sizeof a type name requires parentheses. */
+    /* sizeof(char) 等于一个 C 字节；CHAR_BIT 可查询一个字节包含的比特数。 */
+    /* 类型的具体大小随实现而异；sizeof 后接类型名时必须加括号。 */
     return 0;
 }

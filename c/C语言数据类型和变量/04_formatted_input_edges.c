@@ -1,7 +1,8 @@
 /*
- * Demonstrate scanf scansets and %n using fixed, controlled input.
- * Input: none. Compile as C11 and run.
+ * 使用固定输入演示 scanf 扫描集和 %n。
+ * 输入：无。使用 C11 编译后运行。
  */
+#define __STDC_WANT_LIB_EXT1__ 1
 #include <stdio.h>
 
 int main(void)
@@ -26,7 +27,12 @@ int main(void)
     int assignments = sscanf("42 rest", "%d%n", &value, &consumed);
     printf("%%n consumed=%d; counted assignments=%d; value=%d\n",
            consumed, assignments, value);
-    /* %n stores the consumed-character count but does not increase scanf's return value. */
-    /* scanf_s is an optional Annex K interface and is not available on every implementation. */
+    /* %n 保存已经读取的字符数，但不增加 scanf 的成功赋值计数。 */
+    /* 先请求可选的 Annex K 接口，再查询实现是否公开支持；不支持时仍使用标准 scanf 接口。 */
+#if defined(__STDC_LIB_EXT1__)
+    puts("This implementation advertises the optional Annex K interfaces.");
+#else
+    puts("This implementation does not advertise Annex K; standard scanf remains available.");
+#endif
     return 0;
 }

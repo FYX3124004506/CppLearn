@@ -1,6 +1,6 @@
 /*
- * Demonstrate printf conversions, promotions, widths, and precision.
- * Input: none. Compile as C11 and run.
+ * 演示 printf 转换说明、默认参数提升、字段宽度和精度。
+ * 输入：无。使用 C11 编译后运行。
  */
 #if defined(__MINGW32__) && !defined(__USE_MINGW_ANSI_STDIO)
 #define __USE_MINGW_ANSI_STDIO 1
@@ -9,8 +9,8 @@
 #include <stddef.h>
 #include <stdio.h>
 
-/* Match each conversion to one promoted argument; a mismatch can be undefined.
- * printf adds no newline unless the format contains \n.
+/* 每个转换说明都要匹配经过默认参数提升后的实参类型；不匹配可能导致未定义行为。
+ * printf 不会自动换行，只有格式字符串包含 \n 时才输出换行符。
  */
 
 int main(void) {
