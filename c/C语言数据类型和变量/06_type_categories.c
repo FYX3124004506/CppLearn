@@ -23,17 +23,44 @@ enum Status {
     STATUS_DONE
 };
 
+/*
+ * 用途：返回两个 int 操作数的和，供函数指针分类示例调用。
+ * 参数：left、right 为 int 加数；调用方需保证数学和可由 int 表示。
+ * 返回值：left + right。
+ * 异常/错误：C 无异常机制；不检测有符号溢出，调用方通过约束输入值避免未定义行为。
+ * 副作用：无。
+ * 复杂度：时间 O(1)，辅助空间 O(1)；只执行一次整数加法。
+ * 示例：main 将 add 赋给 operation，随后以 operation(2, 3) 调用。
+ */
 static int add(int left, int right)
 {
     return left + right;
 }
 
 /* void 是无返回值类型；函数执行动作，但不产生可供保存的返回值。 */
+/*
+ * 用途：把接收的枚举状态作为整数值输出。
+ * 参数：status 为 enum Status 示例值；本文件调用时传入 STATUS_DONE。
+ * 返回值：无（void）。
+ * 异常/错误：C 无异常机制；不验证枚举值是否来自已命名项，输出错误未检查。
+ * 副作用：向 stdout 写一行状态值。
+ * 复杂度：时间 O(1)，辅助空间 O(1)；只格式化一个枚举值。
+ * 示例：main 在 status 初始化为 STATUS_DONE 后调用 print_status(status)。
+ */
 static void print_status(enum Status status)
 {
     printf("状态函数收到枚举值：%d\n", (int)status);
 }
 
+/*
+ * 用途：用真实对象展示算术、枚举、聚合、指针和函数指针类型。
+ * 参数：无。
+ * 返回值：0 表示示例正常结束。
+ * 异常/错误：C 无异常机制；固定示例值均可表示，标准输出错误未检查。
+ * 副作用：向 stdout 输出分类结果；经 operation 调用 add 一次。
+ * 复杂度：时间 O(1)，辅助空间 O(1)；数组长度固定为 3，未随外部规模增长。
+ * 示例：运行本文件进入 main(void)，其中 operation(2, 3) 展示函数指针调用。
+ */
 int main(void)
 {
     puts("-- 算术类型与枚举 --");

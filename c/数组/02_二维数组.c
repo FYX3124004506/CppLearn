@@ -8,8 +8,18 @@
 #include <stddef.h>
 #include <stdio.h>
 
+/*
+用途：展示二维数组的行列初始化、按行遍历、连续存储，并读取一个 2×3 整数矩阵。
+参数：无（main 的参数列表为 void）。
+返回值：所有输入转换成功时返回 0；任一整数读取失败时返回 1。
+异常/错误：C 不使用异常机制；每个 scanf 都检查是否转换出 1 个整数，失败时向 stderr 提示并提前返回 1。
+副作用：向 stdout 打印示例、输入提示和矩阵；输入错误时向 stderr 输出诊断；从 stdin 读取 6 个整数。
+复杂度：令 R、C 表示遍历的行数和列数；演示遍历时间 O(R×C)，本例尺寸固定所以实际为 O(1)；辅助空间 O(1)，另有固定大小的局部数组。
+示例：运行程序后输入“1 2 3 4 5 6”，main 按两行三列读入并逐行打印。
+*/
 int main(void)
 {
+    /* ROWS、COLUMNS 的单位都是行数/列数；本例分别为 3 行和 4 列。 */
     enum { ROWS = 3, COLUMNS = 4 };
 
     /*
@@ -36,6 +46,7 @@ int main(void)
     size_t inferred_row_count =
         sizeof inferred_rows / sizeof inferred_rows[0];
 
+    /* row 范围 [0, ROWS)，column 范围 [0, COLUMNS)，先行后列可覆盖每个有效元素且不会越界。 */
     printf("部分初始化的 %d 行 %d 列数组：\n", ROWS, COLUMNS);
     for (size_t row = 0; row < ROWS; ++row) {
         for (size_t column = 0; column < COLUMNS; ++column) {
@@ -69,6 +80,7 @@ int main(void)
     /* 二维输入仍逐元素读取，& 取得当前行列位置的地址。 */
     int entered[2][3];
     puts("请输入 2 行、每行 3 个整数（空格或回车分隔）：");
+    /* row 范围 [0, 2)，column 范围 [0, 3)；合计 6 次转换，任何一次失败都不继续打印未完整读入的矩阵。 */
     for (size_t row = 0; row < 2; ++row) {
         for (size_t column = 0; column < 3; ++column) {
             if (scanf("%d", &entered[row][column]) != 1) {
@@ -79,6 +91,7 @@ int main(void)
     }
 
     puts("读入的二维数组：");
+    /* 与读取时使用相同的行列边界，逐行输出刚才成功读入的 6 个元素。 */
     for (size_t row = 0; row < 2; ++row) {
         for (size_t column = 0; column < 3; ++column) {
             printf("%d%c", entered[row][column],

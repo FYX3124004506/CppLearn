@@ -9,6 +9,15 @@
 #include <stdio.h>
 
 /*
+用途：把指定数量的整数依次打印在一行，便于 main 展示不同数组。
+参数：label 是输出标签；values 指向至少 count 个 int 元素；count 的单位是元素个数，允许为 0。
+返回值：无（void）。
+异常/错误：C 不使用异常机制；本函数不检查指针和容量，调用者须保证 count 大于 0 时 values 有效，label 指向有效字符串。
+副作用：向标准输出写入标签、元素和换行符。
+复杂度：令 n=count；时间 O(n)，辅助空间 O(1)，只使用循环下标。
+示例：main 中 print_values("完整初始化", complete, complete_count) 按 complete_count 个元素打印 complete。
+*/
+/*
 数组形参会调整为指针，因此调用者要把元素个数一并传入。
 函数依靠 count 控制访问范围，不在形参内部用 sizeof 推算长度。
 */
@@ -24,6 +33,15 @@ static void print_values(const char *label, const int values[], size_t count)
 /* 静态存储期对象即使没有显式初始化，元素也会初始化为零。 */
 static int static_values[3];
 
+/*
+用途：展示数组初始化、元素个数和地址等信息，然后读取并打印 3 个整数。
+参数：无（main 的参数列表为 void）。
+返回值：全部输入成功时返回 0；任一次整数读取失败时返回 1。
+异常/错误：C 不使用异常机制；逐个检查 scanf 的转换数，输入不足或格式错误时向 stderr 报错并提前返回 1。
+副作用：向 stdout 打印演示结果和提示；输入错误时向 stderr 打印诊断；从 stdin 读取 3 个整数。
+复杂度：本程序的示例数组和输入长度均固定，时间与辅助空间均为 O(1)；各遍历按对应数组元素数线性执行。
+示例：运行程序并在提示后输入“1 2 3”，main 会检查三次 scanf 并打印这三个值。
+*/
 int main(void)
 {
     /* 数组类型由元素类型和元素个数组成，长度为 4。 */
@@ -32,6 +50,7 @@ int main(void)
     int inferred[] = {3, 6, 9};    /* 长度由初始化项推导为 3 */
     char letters[5] = {'a', 'b'}; /* 后续字符为 '\0' */
 
+    /* complete_count 的单位是元素个数（本例为 4）；sizeof 的结果单位是字节。 */
     size_t complete_count = sizeof complete / sizeof complete[0];
 
     print_values("完整初始化", complete, complete_count);
@@ -79,6 +98,7 @@ int main(void)
     */
     int input_values[3];
     puts("请输入 3 个整数（空格或回车分隔）：");
+    /* i 是 input_values 的下标，范围 [0, 3)；每次只在确认 scanf 成功后才继续，避免打印未写入的元素。 */
     for (size_t i = 0; i < 3; ++i) {
         if (scanf("%d", &input_values[i]) != 1) {
             fputs("输入失败：请提供 3 个整数。\n", stderr);
