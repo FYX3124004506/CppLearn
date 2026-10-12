@@ -200,6 +200,18 @@ static int play_game(int secret)
     }
 }
 
+static int make_seed_from_time(time_t current_time, unsigned int *seed)
+{
+    /* time 失败时返回 (time_t)-1，先识别哨兵，避免把失败值当作种子。 */
+    if (current_time == (time_t)-1) {
+        return 0;
+    }
+
+    /* 常见平台的 time_t 当前值可转换为 unsigned int；转换会折叠到种子范围。 */
+    *seed = (unsigned int)current_time;
+    return 1;
+}
+
 int main(void)
 {
     show_rand_bounds_and_default_seed();
@@ -207,7 +219,8 @@ int main(void)
     show_modulo_bias_example();
 
     time_t current_time = time(NULL);
-    if (current_time == (time_t)-1) {
+    unsigned int time_seed;
+    if (!make_seed_from_time(current_time, &time_seed)) {
         fputs("无法读取当前日历时间。\n", stderr);
         return 1;
     }
@@ -215,11 +228,13 @@ int main(void)
     printf("当前实现 sizeof(time_t)=%lu bytes\n",
            (unsigned long)sizeof current_time);
 
-    /*
-     * 常见平台的 time_t 当前值可转换为 unsigned int；转换会折叠到种子范围，
-     * 因此短时间内启动的程序可能使用同一整数种子。
-     */
-    unsigned int time_seed = (unsigned int)current_time;
+    /* 直接构造标准失败哨兵，观察转换函数拒绝它而不触发真实系统故障。 */
+    unsigned int ignored_seed = 0U;
+    int failure_sentinel_rejected =
+        !make_seed_from_time((time_t)-1, &ignored_seed);
+    printf("构造的 time 失败哨兵被拒绝：%d\n", failure_sentinel_rejected);
+
+    /* 种子位数有限，同一整数种子会复现序列，短时间内也可能重复。 */
     printf("用于普通游戏的 unsigned int 种子：%u\n", time_seed);
     srand(time_seed);
 
