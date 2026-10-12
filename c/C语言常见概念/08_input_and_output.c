@@ -1,5 +1,8 @@
-/* 练习受限输入、数值解析、范围检查和格式化输出。 */
-
+/*
+ * Demonstrate scanf-family formats and safe line-based numeric parsing.
+ * Input: three lines: a name, a nonnegative integer, and a nonnegative finite number.
+ * Compile as C11, run, then enter those three values.
+ */
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
@@ -8,113 +11,151 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* 读取单个名字，并拒绝超出缓冲区的输入。 */
-static int read_name(char *name, size_t capacity)
+/* scanf %f expects float * and %lf expects double *; printf %f uses double. */
+static void demonstrate_scanf_formats(void)
 {
-    size_t length = 0;
-    int ch;
+    const char sample[] = "-12 42 3.5 6.25 Z word";
+    int signed_value = 0;
+    unsigned int unsigned_value = 0;
+    float single_value = 0.0f;
+    double double_value = 0.0;
+    char character = '\0';
+    char word[20] = "";
+    int assigned = sscanf(sample, "%d %u %f %lf %c %19s",
+                          &signed_value, &unsigned_value, &single_value,
+                          &double_value, &character, word);
 
-    do {
-        ch = getchar();
-    } while (ch != EOF && isspace((unsigned char)ch));
+    printf("assigned=%d: int=%d unsigned=%u float=%.1f double=%.2f char=%c word=%s\n",
+           assigned, signed_value, unsigned_value, single_value,
+           double_value, character, word);
 
-    if (ch == EOF) {
+    char raw_character = '\0';
+    char first_nonspace = '\0';
+    int raw_result = sscanf(" A", "%c", &raw_character);
+    int spaced_result = sscanf(" A", " %c", &first_nonspace);
+    printf("%%c without leading space reads whitespace=%s; with space reads=%c\n",
+           raw_result == 1 && raw_character == ' ' ? "yes" : "no",
+           spaced_result == 1 ? first_nonspace : '?');
+
+    int left = 0;
+    int right = 0;
+    int partial = sscanf("17 nope", "%d %d", &left, &right);
+    printf("matching failure after one assignment returns %d\n", partial);
+
+    int year = 0;
+    int suppressed = sscanf("2026-10", "%d-%*d", &year);
+    printf("suppressed conversion returns %d assignment; year=%d\n", suppressed, year);
+
+    int empty_value = 0;
+    int empty_result = sscanf("", "%d", &empty_value);
+    printf("empty input before conversion returns EOF=%s\n",
+           empty_result == EOF ? "yes" : "no");
+
+    char first_word[20] = "";
+    (void)sscanf("red blue", "%19s", first_word);
+    printf("bounded %%s stops at whitespace: %s\n", first_word);
+    /* A field width counts input characters; multibyte text may need more storage bytes. */
+    /* scanf skips leading space for most conversions, but not for %c, %[ or %n. */
+    /* scanf_s is optional Annex K; numeric input outside the target range is unsafe. */
+}
+
+static int read_line(char *buffer, int capacity)
+{
+    if (capacity < 2 || fgets(buffer, capacity, stdin) == NULL) {
         return 0;
     }
 
-    do {
-        if (length + 1 >= capacity) {
-            while (ch != EOF && !isspace((unsigned char)ch)) {
+    size_t length = strlen(buffer);
+    if (length > 0 && buffer[length - 1] == '\n') {
+        buffer[--length] = '\0';
+    } else {
+        int ch = getchar();
+        if (ch != '\n' && ch != EOF) {
+            while (ch != '\n' && ch != EOF) {
                 ch = getchar();
             }
             return 0;
         }
-        name[length++] = (char)ch;
-        ch = getchar();
-    } while (ch != EOF && !isspace((unsigned char)ch));
-
-    name[length] = '\0';
+    }
+    if (length > 0 && buffer[length - 1] == '\r') {
+        buffer[--length] = '\0';
+    }
     return 1;
 }
 
-/* 先读入受限字符串，再检查转换结果和 int 范围。 */
-static int read_int_token(int *result)
+static int parse_int_line(const char *text, int *result)
 {
-    char text[64];
     char *end;
-    long value;
-
-    if (scanf("%63s", text) != 1 || strlen(text) == sizeof text - 1) {
-        return 0;
-    }
-
     errno = 0;
-    value = strtol(text, &end, 10);
-    if (errno == ERANGE || end == text || *end != '\0' ||
-        value < INT_MIN || value > INT_MAX) {
+    long value = strtol(text, &end, 10);
+
+    if (errno == ERANGE || end == text) {
         return 0;
     }
-
+    while (isspace((unsigned char)*end)) {
+        ++end;
+    }
+    if (*end != '\0' || value < INT_MIN || value > INT_MAX) {
+        return 0;
+    }
     *result = (int)value;
     return 1;
 }
 
-static int read_height(double *result)
+static int parse_finite_nonnegative_double(const char *text, double *result)
 {
-    char text[64];
     char *end;
-    double value;
-
-    if (scanf("%63s", text) != 1 || strlen(text) == sizeof text - 1) {
-        return 0;
-    }
-
     errno = 0;
-    value = strtod(text, &end);
-    if (errno == ERANGE || end == text || *end != '\0' || !isfinite(value) ||
-        value < 0.0) {
+    double value = strtod(text, &end);
+
+    if (errno == ERANGE || end == text) {
         return 0;
     }
-
+    while (isspace((unsigned char)*end)) {
+        ++end;
+    }
+    if (*end != '\0' || !isfinite(value) || value < 0.0) {
+        return 0;
+    }
     *result = value;
     return 1;
 }
 
 int main(void)
 {
+    char name[64];
+    char integer_text[64];
+    char decimal_text[64];
     int age;
-    double height;
-    char name[32];
+    double measurement;
 
-    printf("请输入姓名（不含空格，最多 31 字节）：");
-    if (!read_name(name, sizeof name)) {
-        fprintf(stderr, "姓名无效或过长。\n");
+    demonstrate_scanf_formats();
+
+    printf("Name (one line): ");
+    if (!read_line(name, (int)sizeof name) || name[0] == '\0') {
+        fputs("Name is empty or too long.\n", stderr);
         return 1;
     }
 
-    printf("请输入年龄：");
-    if (!read_int_token(&age) || age < 0) {
-        fprintf(stderr, "年龄输入无效。\n");
+    printf("Age (nonnegative integer): ");
+    if (!read_line(integer_text, (int)sizeof integer_text) ||
+        !parse_int_line(integer_text, &age) || age < 0) {
+        fputs("Age is invalid or outside the int range.\n", stderr);
         return 1;
     }
 
-    printf("请输入身高（米）：");
-    if (!read_height(&height)) {
-        fprintf(stderr, "身高输入无效。\n");
+    printf("Measurement (finite, nonnegative number): ");
+    if (!read_line(decimal_text, (int)sizeof decimal_text) ||
+        !parse_finite_nonnegative_double(decimal_text, &measurement)) {
+        fputs("Measurement is invalid or outside the double range.\n", stderr);
         return 1;
     }
 
-    printf("\n========== 信息确认 ==========\n");
-    printf("姓名：%s\n", name);
-    printf("年龄：%d 岁\n", age);
-    printf("身高：%.2f 米\n", height);
-
-    /* 边界值先检查，避免有符号整数溢出。 */
+    printf("Name: %s\nAge: %d\nMeasurement: %.2f\n", name, age, measurement);
     if (age == INT_MAX) {
-        printf("明年年龄：超出 int 范围\n");
+        puts("Next age is outside the int range.");
     } else {
-        printf("明年年龄：%d 岁\n", age + 1);
+        printf("Next age: %d\n", age + 1);
     }
-
     return 0;
 }
