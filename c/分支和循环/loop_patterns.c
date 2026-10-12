@@ -66,6 +66,7 @@ static void show_while_examples(void)
     }
     putchar('\n');
 
+    /* while 在循环体执行前判断，初始条件为假时可能零次执行。 */
     int zero_iterations = 0;
     int false_condition = 0;
     while (false_condition) {
@@ -77,6 +78,13 @@ static void show_while_examples(void)
 static void show_for_examples(void)
 {
     puts("\n=== for ===");
+
+    /* for 在循环体执行前判断，与 while 一样可能零次执行。 */
+    int zero_iterations = 0;
+    for (int candidate = 1; candidate < 1; ++candidate) {
+        ++zero_iterations;
+    }
+    printf("for 初始条件为假时的执行次数：%d\n", zero_iterations);
 
     int sum = 0;
     for (int multiple = 3; multiple <= 100; multiple += 3) {

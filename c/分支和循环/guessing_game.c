@@ -211,12 +211,17 @@ int main(void)
         fputs("无法读取当前日历时间。\n", stderr);
         return 1;
     }
+    /* 本例的 sizeof(time_t) 可由 unsigned long 表示，显式转换后使用匹配的 %lu。 */
+    printf("当前实现 sizeof(time_t)=%lu bytes\n",
+           (unsigned long)sizeof current_time);
 
     /*
      * 常见平台的 time_t 当前值可转换为 unsigned int；转换会折叠到种子范围，
      * 因此短时间内启动的程序可能使用同一整数种子。
      */
-    srand((unsigned int)current_time);
+    unsigned int time_seed = (unsigned int)current_time;
+    printf("用于普通游戏的 unsigned int 种子：%u\n", time_seed);
+    srand(time_seed);
 
     int simple_sample = simple_random_in_range(GAME_LOW, GAME_HIGH);
     printf("直接取模映射示例（范围内，但可能有偏差）：%d\n",
