@@ -11,16 +11,19 @@
 static int count_decimal_digits(int value)
 {
     /*
-     * 先转为更宽的有符号类型，再取相反数，因此 INT_MIN 也不会在 int 中溢出。
+     * 负数转为 unsigned 后按 UINT_MAX + 1 取模，再用无符号减法取得大小，
+     * 不依赖 long long 是否比 int 多出一个可表示的正值，也不会对 INT_MIN 有符号取反。
      * do while 让 0 至少计为一位。
      */
-    long long magnitude = value < 0 ? -(long long)value : (long long)value;
+    unsigned int magnitude = value < 0
+        ? 0U - (unsigned int)value
+        : (unsigned int)value;
     int digits = 0;
 
     do {
         ++digits;
-        magnitude /= 10;
-    } while (magnitude > 0);
+        magnitude /= 10U;
+    } while (magnitude > 0U);
 
     return digits;
 }
@@ -80,6 +83,15 @@ static void show_for_examples(void)
         sum += multiple;
     }
     printf("1..100 中 3 的倍数之和：%d\n", sum);
+
+    int scope_sum = 0;
+    for (int index = 1; index <= 3; ++index) {
+        scope_sum += index;
+    }
+
+    /* for 初始化位置声明的 index 到循环结束时离开作用域，可在此处重新声明。 */
+    int index = 99;
+    printf("循环内累计=%d，循环后重新声明的 index=%d\n", scope_sum, index);
 
     int value = 4;
     int old_value = value++;
@@ -141,6 +153,7 @@ static void show_break_and_continue(void)
     int number = 0;
     while (number < 5) {
         int current = number;
+        /* 先推进控制变量，再可能 continue，避免跳过更新后停在同一值。 */
         ++number;
         if (current == 2) {
             continue;

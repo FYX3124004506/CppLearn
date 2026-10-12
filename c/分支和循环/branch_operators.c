@@ -107,6 +107,11 @@ static void show_comparisons_and_logic(void)
            larger == smaller,
            larger != smaller);
 
+    int assigned_value = 5;
+    int equals_five = assigned_value == 5;
+    printf("赋值后的值=%d；用 == 判断是否等于 5：%d\n",
+           assigned_value, equals_five);
+
     int age = 50;
     int first_comparison = 18 <= age;
     int chained_as_written = first_comparison <= 40;
@@ -136,6 +141,12 @@ static void show_short_circuit(void)
     int or_result = or_gate || record_side_effect("逻辑或", &side_effect_count);
     printf("短路后：&& 结果 %d，|| 结果 %d，副作用次数 %d\n",
            and_result, or_result, side_effect_count);
+
+    int false_or_gate = 0;
+    int evaluated_or_result =
+        false_or_gate || record_side_effect("逻辑或左侧为假", &side_effect_count);
+    printf("|| 左侧为假：结果 %d，副作用次数 %d\n",
+           evaluated_or_result, side_effect_count);
 
     int enabled_gate = 1;
     int evaluated_result =
@@ -228,6 +239,17 @@ static void show_switch(void)
     int normalized_remainder = (c_remainder + 3) % 3;
     printf("负数余数：%d %% 3 = %d；归一化到 0..2 后为 %d\n",
            negative, c_remainder, normalized_remainder);
+
+    int unmatched_without_default = 7;
+    int branch_runs = 0;
+    /* 没有 default 且 case 不匹配时，switch 不执行分支，随后继续运行。 */
+    switch (unmatched_without_default) {
+        case 0:
+            branch_runs = 1;
+            break;
+    }
+    printf("没有 default 且没有匹配 case：分支执行次数 %d，switch 后继续运行\n",
+           branch_runs);
 }
 
 int main(void)
