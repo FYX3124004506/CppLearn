@@ -27,6 +27,11 @@ int main(void)
            integer_quotient, negative_quotient, floating_quotient, remainder);
     printf("安全的浮点转整数：%.2f -> %d\n", decimal, whole);
 
+    /* 构造一个大于 INT_MAX 的值来展示转换边界；不执行结果不可表示的有符号转换。 */
+    unsigned long long outside_int_range = (unsigned long long)INT_MAX + 1ULL;
+    printf("有符号转换边界：%llu > INT_MAX=%d，超范围转换已跳过。\n",
+           outside_int_range, INT_MAX);
+
     unsigned int mixed_signedness = -1 + 1U;
     unsigned int wrapped = UINT_MAX;
     wrapped += 1U;
