@@ -1,42 +1,27 @@
-/*
- * 文件用途：展示变量声明、初始化、函数定义、按值传参和返回值。
- * 输入：无；两个加数在 main 中固定给出。
- * 输出：显示加数与它们的和。
- * 标准：C99 或更新版本。
- */
-#include <stdio.h> /* 引入 printf 的函数声明，供 main 输出计算结果。 */
+/* 固定数据演示变量初始化、按值传参和函数返回值。 */
+#include <stdio.h>
 
-/*
- * 用途：接收两个整数并返回它们的和。
- * 参数：left 和 right 分别保存调用时传入的两个 int 值。
- * 返回值：int；返回 left 与 right 的和。
- * 错误处理：本函数不检查溢出；调用者应保证数学和能由 int 表示。
- * 副作用：无；参数是函数内的值，只计算并返回结果。
- */
+/* static 限制辅助函数只在当前源文件可见；参数接收调用时传入的 int 值。 */
 static int add(int left, int right) {
-    return left + right; /* + 对两个 int 求和；return 把结果交回调用处并结束 add。 */
+    return left + right;
 }
 
-/*
- * 用途：准备两个固定整数，调用 add，并显示计算关系。
- * 参数：无；void 表示不接收启动参数。
- * 返回值：int；成功返回 0。
- * 错误处理：没有外部输入；固定加数不会溢出；printf 写出错误未检查。
- * 副作用：向标准输出写入一行结果。
- */
 int main(void) {
-    int first = 2; /* 声明并初始化第一个加数，作为 add 的第一个实参。 */
-    int second = 3; /* 声明并初始化第二个加数，作为 add 的第二个实参。 */
-    int total = add(first, second); /* 调用 add 时把两个变量的值复制给形参，并用返回值初始化 total。 */
-    // 受控编译反例：return 是关键字，不能作为标识符；取消下一行注释会导致编译失败。
+    int first = 2;
+    int second = 3;
+
+    /* 调用时复制实参值给形参；add 返回的和用于初始化 total。 */
+    int total = add(first, second);
+
+    /* 受控编译反例：return 是关键字，不能用作变量名；取消下一行注释会编译失败。 */
     // int return = 10;
-    printf("%d + %d = %d\n", first, second, total); /* 三个 %d 依次匹配三个 int 值，显示输入和计算结果。 */
-    return 0; /* 结束 main 并报告正常结束。 */
+
+    printf("%d + %d = %d\n", first, second, total);
+    return 0;
 }
 
 /* 示例输入：无；两个加数固定为 2 和 3。
  * 预期输出：
  * 2 + 3 = 5
- * 预期编译结论：当前文件的活动代码可编译；若在函数体中取消 int return = 10; 的注释，编译器会拒绝把关键字当作变量名，诊断措辞依实现而异。
- * 关键结果：函数参数接收实参的值；add 返回 5 后，main 才继续执行 printf。
+ * 编译说明：活动代码可编译；若取消 int return = 10; 的注释，编译器会拒绝关键字作为标识符。
  */

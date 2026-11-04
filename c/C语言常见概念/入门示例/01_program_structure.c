@@ -1,26 +1,15 @@
-/*
- * 文件用途：展示 C 程序入口、整数变量、格式化输出和正常结束。
- * 输入：无；示例数据在 main 中固定。
- * 输出：向标准输出显示一个计数值。
- * 标准：C99 或更新版本。
- */
-#include <stdio.h> /* 引入 printf 的声明；调用标准输入输出函数前需要对应声明。 */
+/* 固定数据示范 C 程序入口、整数初始化和标准输出。 */
+#include <stdio.h>
 
-/*
- * 用途：作为程序入口并输出固定计数。
- * 参数：无；void 表示不接收命令行参数。
- * 返回值：int；返回 0 表示正常结束。
- * 错误处理：没有外部输入；本例不检查 printf 的写出错误。
- * 副作用：向标准输出写入一行文本。
- */
+/* void 明确 main 不接收参数；int 返回 0 让宿主环境识别正常结束。 */
 int main(void) {
-    int item_count = 3; /* 声明 int 对象并初始化为 3，供下一句输出；变量名说明它代表项目数量。 */
-    printf("item_count = %d\n", item_count); /* %d 对应 int；\n 换行；显示当前计数以便观察初始化值。 */
-    return 0; /* 结束 main，并向运行环境报告成功状态。 */
+    int item_count = 3;
+    printf("item_count = %d\n", item_count);
+    return 0;
 }
 
-/* 示例输入：无；item_count 在程序内固定为 3。
+/* 示例输入：无。
  * 预期输出：
  * item_count = 3
- * 关键结果：程序从 main 开始执行；变量初始化后，printf 按 %d 把整数格式化为文本。
+ * 关键结果：item_count 初始化为 3，printf 用 %d 输出 int 值。
  */
